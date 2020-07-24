@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using JavaScriptEngineSwitcher.V8;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using React.AspNet;
+using ReactDemo.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReactDemo
 {
@@ -34,6 +36,9 @@ namespace ReactDemo
                 .AddV8();
 
             services.AddControllersWithViews();
+
+            services.AddDbContext<CommentContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("CommentContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

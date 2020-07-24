@@ -3,59 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ReactDemo.Data;
 using ReactDemo.Models;
 
 namespace ReactDemo.Controllers
 {
     public class HomeController : Controller
     {
-        private static readonly IList<CommentModel> _comments;
-
-        static HomeController()
+        // Using Dependency Injection (for simplicity) rather than making a Services folder
+        private readonly CommentContext _context;
+        public HomeController(CommentContext context)
         {
-            _comments = new List<CommentModel>
-            {
-                new CommentModel
-                {
-                    Id = 1,
-                    Author = "Daniel Lo Nigro",
-                    Text = "Hello ReactJS.NET World!"
-                },
-                new CommentModel
-                {
-                    Id = 2,
-                    Author = "Pete Hunt",
-                    Text = "This is one comment"
-                },
-                new CommentModel
-                {
-                    Id = 3,
-                    Author = "Jordan Walke",
-                    Text = "This is *another* comment"
-                },
-            };
+            _context = context;
         }
 
         public ActionResult Index()
         {
-            return View(_comments);
+            return View(_context.Comment.AsNoTracking().ToList());
         }
 
         [Route("comments")]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public ActionResult Comments()
         {
-            return Json(_comments);
+            return Json(_context.Comment.AsNoTracking().ToList());
         }
 
         [Route("comments/new")]
         [HttpPost]
-        public ActionResult AddComment(CommentModel comment)
+        public ActionResult AddComment(Comment comment)
         {
-            //Create a fake ID for this comment
-            comment.Id = _comments.Count + 1;
-            _comments.Add(comment);
-            return Content("Success :)");
+            if (!ModelState.IsValid)
+            {
+                // handleSubmit handles validation, but I put this in here anyway
+                return RedirectToAction(nameof(Index));
+            }
+            _context.Add(comment);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

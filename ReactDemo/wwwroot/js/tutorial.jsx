@@ -115,6 +115,7 @@ class Comment extends React.Component {
     }
 }
 
+// Got rid in order to use server-side rendering with .NET Core
 //ReactDOM.render(
 //    <CommentBox url="/comments" submitUrl="/comments/new" pollInterval={2000}/>,
 //    document.getElementById('content')
